@@ -75,3 +75,9 @@ curl http://localhost:8000/user/user_id/device/{device_id}/statistics/async
 ```bash
 curl http://localhost:8000/device/{device_id}/statistics/async
 ```
+
+Проверка статуса задачи:
+
+```bash
+curl http://localhost:8000/analytics/status/{task_id}
+```

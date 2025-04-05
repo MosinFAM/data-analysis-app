@@ -1,40 +1,11 @@
-from celery import Celery
-import logging
 from fastapi import Query, HTTPException
-from app.models import DeviceModel, DeviceStatisticModel
+from app.logger import logger
+from app.models.models import DeviceModel, DeviceStatisticModel
 from datetime import datetime
 from typing import Optional
 import asyncio
 from app.utils.statistics import get_statistics, get_full_statistics
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from app.database import DATABASE_URL 
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
-# Создаем асинхронный engine
-engine = create_async_engine(DATABASE_URL, echo=True)
-
-# Создаем сессию с привязкой к engine
-AsyncSessionLocal = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
-
-celery = Celery(__name__)
-celery.conf.broker_url = "redis://redis:6379/0"
-celery.conf.result_backend = "redis://redis:6379/0"
-
-celery.conf.update(
-    result_serializer='json',
-    accept_content=['json'],
-    task_serializer='json',
-    result_extended=True
-)
+from app.tasks.celery import AsyncSessionLocal, celery
 
 
 @celery.task(name="get_statistics")

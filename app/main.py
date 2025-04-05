@@ -1,27 +1,22 @@
-import logging
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, HTTPException
 from typing import Optional
 from datetime import datetime
 from sqlalchemy import select
 from fastapi.responses import JSONResponse
-from app.database import lifespan, SessionDep
-from app.models import (
+from app.logger import logger
+from app.database.database import lifespan, SessionDep
+from app.models.models import (
     UserModel, DeviceModel, DeviceStatisticModel
 )
-from app.schemas import (
+from app.schemas.schemas import (
     UserCreateSchema, DeviceSchema,
     DeviceStatisticSchema, UserSchema, DeviceOutSchema,
 )
 from celery.result import AsyncResult
-from app.celery_worker import calculate_device_statistics, celery
-# from app.utils.statistics import get_statistics
+from app.tasks.celery_worker import calculate_device_statistics, celery
 
 
 app = FastAPI(lifespan=lifespan)
-
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 @app.get("/users", response_model=list[UserSchema])
@@ -160,71 +155,3 @@ def get_task_status(task_id: str):
     except Exception as e:
         logger.error(f"Ошибка при получении статуса задачи {task_id}: {e}")
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
-
-
-# # Каждая статистика в отдельности
-# @app.get("/device/{device_id}/statistics")
-# async def get_device_statistics(
-#     device_id: int,
-#     session: SessionDep,
-#     start_date: Optional[datetime] = Query(None),
-#     end_date: Optional[datetime] = Query(None)
-# ):
-
-#     filters = [DeviceStatisticModel.device_id == device_id]
-#     if start_date:
-#         filters.append(DeviceStatisticModel.created_at >= start_date)
-#     if end_date:
-#         filters.append(DeviceStatisticModel.created_at <= end_date)
-
-#     query = select(DeviceStatisticModel).filter(*filters)
-#     result = await session.execute(query)
-#     stats = result.scalars().all()
-#     logger.info("Fetched %d statistics for device_id=%d",
-#                 len(stats),
-#                 device_id)
-#     return stats
-
-
-# # Статистика устройств конкретного пользователя
-# @app.get("/user/{user_id}/statistics")
-# async def get_user_statistics(
-#     user_id: int,
-#     session: SessionDep,
-#     start_date: Optional[datetime] = Query(None),
-#     end_date: Optional[datetime] = Query(None)
-# ):
-
-#     filters = [DeviceModel.user_id == user_id]
-#     if start_date:
-#         filters.append(DeviceStatisticModel.created_at >= start_date)
-#     if end_date:
-#         filters.append(DeviceStatisticModel.created_at <= end_date)
-
-#     logger.info("Fetching statistics for user_id=%d", user_id)
-#     return await get_statistics(filters, session)
-
-
-# # Статистика конкретного устройства пользователя
-# @app.get("/user/{user_id}/device/{device_id}/statistics")
-# async def get_device_statistics_for_user(
-#     user_id: int,
-#     device_id: int,
-#     session: SessionDep,
-#     start_date: Optional[datetime] = Query(None),
-#     end_date: Optional[datetime] = Query(None)
-# ):
-
-#     filters = [
-#         DeviceModel.user_id == user_id,
-#         DeviceModel.id == device_id
-#     ]
-#     if start_date:
-#         filters.append(DeviceStatisticModel.created_at >= start_date)
-#     if end_date:
-#         filters.append(DeviceStatisticModel.created_at <= end_date)
-
-#     logger.info("Fetching statistics for user_id=%d and device_id=%d",
-#                 user_id,
-#                 device_id)
-#     return await get_statistics(filters, session)

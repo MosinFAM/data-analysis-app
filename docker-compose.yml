@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: celery -A app.celery_worker.celery worker --loglevel=info
+    command: celery -A app.tasks.celery_worker.celery worker --loglevel=info
     volumes:
       - .:/app
     depends_on:

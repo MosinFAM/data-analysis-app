@@ -1,10 +1,10 @@
-from app.database import SessionDep
+from app.database.database import SessionDep
 from statistics import median
 from sqlalchemy import select, func
-from app.models import (
+from app.models.models import (
     DeviceModel, DeviceStatisticModel
 )
-from app.schemas import (
+from app.schemas.schemas import (
     AxisStatisticSchema, FullStatisticsResponse, DeviceStatisticSchema
 )
 
