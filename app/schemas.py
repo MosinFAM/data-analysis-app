@@ -32,3 +32,25 @@ class DeviceOutSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class BaseResponse(BaseModel):
+    ok: bool
+
+
+class CreatedResponse(BaseResponse):
+    id: int
+
+
+class AxisStatisticSchema(BaseModel):
+    min: float
+    max: float
+    count: int
+    sum: float
+    median: float
+
+
+class FullStatisticsResponse(BaseModel):
+    x: AxisStatisticSchema
+    y: AxisStatisticSchema
+    z: AxisStatisticSchema

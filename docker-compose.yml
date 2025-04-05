@@ -8,3 +8,24 @@ services:
       - .:/app
     ports:
       - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./test.db
+      - REDIS_URL=redis://redis:6379/0
+  # redis:
+  #   image: redis:latest
+  #   ports:
+  #     - "6379:6379"
+
+  # celery:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: celery -A app.celery_app.celery worker --loglevel=info
+  #   volumes:
+  #     - .:/app
+  #   depends_on:
+  #     - app
+  #     - redis
+  #   environment:
+  #     - DATABASE_URL=sqlite+aiosqlite:///./test.db
+  #     - REDIS_URL=redis://redis:6379/0

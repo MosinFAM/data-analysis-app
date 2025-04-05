@@ -6,10 +6,12 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     AsyncSession
 )
+import os
 
 
-engine = create_async_engine('sqlite+aiosqlite:///./test.db', echo=True)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
 
+engine = create_async_engine(DATABASE_URL, echo=True)
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
