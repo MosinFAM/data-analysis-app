@@ -37,7 +37,7 @@ docker compose -f docker-compose.yml up -d --build
 ```bash
 curl -X POST http://localhost:8000/users \
   -H "Content-Type: application/json" \
-  -d '{"name": "Alice"}'
+  -d '{"name": "user_name"}'
 ```
 
 2. Добавить устройство
@@ -45,7 +45,7 @@ curl -X POST http://localhost:8000/users \
 ```bash
 curl -X POST http://localhost:8000/devices \
   -H "Content-Type: application/json" \
-  -d '{"name": "iPhone", "user_id": 1}'
+  -d '{"name": "device_name", "user_id": user_id}'
 ```
 
 3. Добавить статистику
@@ -53,19 +53,25 @@ curl -X POST http://localhost:8000/devices \
 ```bash
 curl -X POST http://localhost:8000/statistics \
   -H "Content-Type: application/json" \
-  -d '{"x": 1.0, "y": 2.0, "z": 3.0, "device_id": 1}'
+  -d '{"x": 1.0, "y": 2.0, "z": 3.0, "device_id": device_id}'
 ```
 
-5. Создать пользователя
+Получение статистик в асинхронном режиме при помощи Celery:
+
+1. Статистика устройств конкретного пользователя
 
 ```bash
-curl -X POST http://localhost:8000/users \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Alice"}'
+curl http://localhost:8000/user/{user_id}/statistics/async
 ```
 
-6. Статистика устройств конкретного пользователя
+2. Статистика конкретного устройства пользователя
 
 ```bash
-curl http://localhost:8000/user/1/statistics
+curl http://localhost:8000/user/user_id/device/{device_id}/statistics/async
+```
+
+3. Каждая статистика в отдельности
+
+```bash
+curl http://localhost:8000/device/{device_id}/statistics/async
 ```

@@ -5,7 +5,7 @@ from app.models import (
     DeviceModel, DeviceStatisticModel
 )
 from app.schemas import (
-    AxisStatisticSchema, FullStatisticsResponse
+    AxisStatisticSchema, FullStatisticsResponse, DeviceStatisticSchema
 )
 
 
@@ -35,11 +35,12 @@ async def get_statistics(filters, session: SessionDep) -> FullStatisticsResponse
     y_vals = [r[1] for r in rows]
     z_vals = [r[2] for r in rows]
 
-    return FullStatisticsResponse(
+    stats = FullStatisticsResponse(
         x=format_stats(agg_data[0:4], x_vals),
         y=format_stats(agg_data[4:8], y_vals),
         z=format_stats(agg_data[8:12], z_vals),
     )
+    return stats
 
 
 def format_stats(agg, values) -> AxisStatisticSchema:
@@ -50,3 +51,10 @@ def format_stats(agg, values) -> AxisStatisticSchema:
         sum=agg[3],
         median=median(values) if values else None
     )
+
+
+async def get_full_statistics(filters, session: SessionDep):
+    query = select(DeviceStatisticModel).filter(*filters)
+    result = await session.execute(query)
+    stats = result.scalars().all()
+    return [DeviceStatisticSchema.from_orm(stat) for stat in stats]

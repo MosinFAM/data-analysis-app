@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import Optional
+from pydantic import ConfigDict
 
 
 class UserCreateSchema(BaseModel):
@@ -6,23 +8,26 @@ class UserCreateSchema(BaseModel):
 
 
 class DeviceStatisticSchema(BaseModel):
-    x: float
-    y: float
-    z: float
+    x: Optional[float]
+    y: Optional[float]
+    z: Optional[float]
     device_id: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DeviceSchema(BaseModel):
     name: str
     user_id: int
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class UserSchema(BaseModel):
     id: int
     name: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DeviceOutSchema(BaseModel):
@@ -30,8 +35,7 @@ class DeviceOutSchema(BaseModel):
     name: str
     user_id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class BaseResponse(BaseModel):
@@ -43,14 +47,18 @@ class CreatedResponse(BaseResponse):
 
 
 class AxisStatisticSchema(BaseModel):
-    min: float
-    max: float
+    min: Optional[float]
+    max: Optional[float]
     count: int
-    sum: float
-    median: float
+    sum: Optional[float]
+    median: Optional[float]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class FullStatisticsResponse(BaseModel):
     x: AxisStatisticSchema
     y: AxisStatisticSchema
     z: AxisStatisticSchema
+
+    model_config = ConfigDict(from_attributes=True)
